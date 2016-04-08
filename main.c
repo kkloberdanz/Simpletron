@@ -211,6 +211,7 @@ int main(int argc, char* argv[]) {
     int accumulator           = 0;
     int instruction_counter   = 0;
     int instruction_register  = 0;
+
     int op_code               = 0;
     int operand               = 0;
 

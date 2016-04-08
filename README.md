@@ -67,3 +67,19 @@ SAL or Simpletron Assembly Language is as follows:
     So a valid comment would be:
 
         READ 20     ; Reads an integer from terminal into mem location 20
+
+    The Simpletron Machine has 3 special registers:
+        accumulator             Used for arithmetic and to store values 
+                                for later use.
+
+        instruction_counter     Points to the memory location to fetch
+                                instructions from.
+
+        instruction_register    Holds the op_code and the opperand
+                                Example: 
+                                    if instruction_register = 1120 
+                                    OP_CODE  = 11
+                                    OPPERAND = 20
+
+                                    This instruction writes the integer
+                                    11 to memory location 20
