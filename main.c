@@ -33,9 +33,9 @@
 #define HALT            43
 
 void printGreeting() {
-    puts("*** Welcome to Simpletron! ***");
-    puts("*** Please enter your program one instruction ***");
-    puts("*** (or data word) at a time. ***");
+    puts("***           Welcome to Simpletron!           ***");
+    puts("*** Please enter your program one instruction  ***");
+    puts("***          (or data word) at a time.         ***");
     puts("*** Enter -99999 to stop entering your program ***");
 }
 
@@ -60,7 +60,7 @@ void computer_dump(int acc,
     printf("op_code                 %02d\n", op_code);
     printf("operand                 %02d\n", operand);
 
-    const int col_len = 10;
+    const int col_len = 5;
     int i, j;
 
     /* dump the memory */
@@ -98,9 +98,16 @@ int main(void) {
         printf("%02d ? ", i);
         scanf("%d", &user_input);
 
-        if (user_input != -99999) {
+        if ((user_input != -99999) && 
+            (user_input >=  -9999) &&
+            (user_input <=   9999) ){
+
             memory[i] = user_input;
             ++i;
+        } else if ( ((user_input <   -9999)  ||
+                     (user_input >    9999)) &&
+                     (user_input != -99999)) {
+            puts("*** ERROR: acceptable range is from -9999 to 9999 ***");
         }
     }
 
@@ -119,17 +126,18 @@ int main(void) {
     int op_code               = 0;
     int operand               = 0;
 
-    for (instruction_counter = 0; 
-         instruction_counter < i; ++instruction_counter) {
-        instruction_register = memory[instruction_counter];
+    for (instruction_counter  = 0; 
+         instruction_counter  < i; 
+         ++instruction_counter) {
+
+         instruction_register = memory[instruction_counter];
 
         op_code = instruction_register / 100;
         operand = instruction_register % 100; 
 
-        /* TODO: implement read, store, and branching
+        /* TODO: implement write, store
          */
-        switch (op_code) {
-
+        switch (op_code) { 
 
             case READ:
                 printf("? ");
@@ -156,19 +164,36 @@ int main(void) {
                 accumulator *= memory[operand];
                 break;
 
+            case BRANCH:
+                instruction_counter = operand;
+                break;
+
+            case BRANCHZERO:
+                if (accumulator == 0) {
+                    instruction_counter = operand;
+                }
+                break;
+
+            case BRANCHNEG:
+                if (accumulator < 0) {
+                    instruction_counter = operand;
+                }
+                break;
+
             case HALT:
                 halt();
+                computer_dump(accumulator, 
+                              instruction_counter, 
+                              instruction_register, 
+                              op_code, 
+                              operand,
+                              memory,
+                              MEMORY_SIZE); 
                 break;
         }
 
-        computer_dump(accumulator, 
-                      instruction_counter, 
-                      instruction_register, 
-                      op_code, 
-                      operand,
-                      memory,
-                      MEMORY_SIZE);
-    }
+    } // end for loop
+
 
     return 0;
 }
