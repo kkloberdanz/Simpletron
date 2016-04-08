@@ -17,30 +17,46 @@ SAL or Simpletron Assembly Language is as follows:
 
     The current valid OP_CODE's with corresponding machine code 
     and description are:
-        Input/Output operations
-         NOOP            00
-         READ            10
-         WRITE           11
 
-         READ_ASCII      14
-         WRITE_ASCII     15
-         WRITE_NEWLINE   16
+        Input/Output operations
+         NOOP            00     Do nothing
+
+         READ            10     Read word from terminal, 
+                                store at memory[OPPERAND]
+
+         WRITE           11     Write to terminal word at the memory
+                                location of opperand
+
+         READ_ASCII      14     Same as read, but for ascii text
+
+         WRITE_ASCII     15     Same as write, but for ascii text
+
+         WRITE_NEWLINE   16     Writes a new line to terminal
 
         Load/Store operations
-         LOAD            20
-         STORE           21
+         LOAD            20     Load a word from memory[OPPERAND] 
+                                into the accumulator
 
-        Arithmetic Operations
-         ADD             30
-         SUBTRACT        31
-         DIVIDE          32
-         MULTIPLY        33
+         STORE           21     Store a word from the accumulator
+                                into memory[OPPERAND]
+
+        Arithmetic Operations:  Results stored in accumulator
+         ADD             30     add opperand to accumulator
+
+         SUBTRACT        31     subract opperand from accumulator
+
+         DIVIDE          32     divide accumulator by opperand
+
+         MULTIPLY        33     multiply accumulator by opperand
 
         Transfter of control Operations
-         BRANCH          40     unconditional branch
-         BRANCHNEG       41     branch if negative 
-         BRANCHZERO      42     branch if zero
-         HALT            43     display memory and registers
+         BRANCH          40     unconditional branch, goto opperand
+
+         BRANCHNEG       41     branch if negative, goto opperand
+
+         BRANCHZERO      42     branch if zero, goto opperand
+
+         HALT            43     display memory and registers, goto opperand
 
     A valid instruction to read an integer from the terminal, and store
     it in memory location 20 would be:
