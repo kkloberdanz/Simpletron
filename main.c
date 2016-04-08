@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MEMORY_SIZE     100
+#define MEMORY_SIZE    100
 
 /* Input/Output operations */
 #define READ            10
@@ -66,7 +66,7 @@ void computer_dump(int acc,
     /* dump the memory */
     printf("MEMORY:\n");
     printf("          %d", 0);
-    for (i = 1; i < 10; ++i) {
+    for (i = 1; i < col_len; ++i) {
         printf("        %d", i);
     }
     puts("");
