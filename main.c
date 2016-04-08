@@ -60,13 +60,23 @@ void computer_dump(int acc,
     printf("op_code                 %02d\n", op_code);
     printf("operand                 %02d\n", operand);
 
-    /* TODO: dump the memory */
-    /*
-    printf("MEMORY:\n");
-    for (int i = 0; i < size_of_memory; ++i) {
+    const int col_len = 10;
+    int i, j;
 
+    /* dump the memory */
+    printf("MEMORY:\n");
+    printf("          %d", 0);
+    for (i = 1; i < 10; ++i) {
+        printf("        %d", i);
     }
-    */
+    puts("");
+    for (i = 0; i < size_of_memory; i += col_len) { 
+        printf("%02d", i);
+        for (j = 0; j < col_len; ++j) {
+            printf("    %+05d", mem_arr[i+j]);
+        }
+        printf("%c", '\n');
+    }
 
 }
 
@@ -75,9 +85,15 @@ int main(void) {
 
     int memory[MEMORY_SIZE];
 
+    /* initialize memory to all zero */
+    int i = 0;
+    for (i = 0; i < MEMORY_SIZE; ++i) {
+        memory[i] = 0;
+    }
+
     /* Read input, store in memory */
     int user_input = 0;
-    int i = 0;
+    i = 0;
     while ((user_input != -99999) && (i < MEMORY_SIZE)) {
         printf("%02d ? ", i);
         scanf("%d", &user_input);
