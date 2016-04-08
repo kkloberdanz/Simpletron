@@ -25,11 +25,13 @@
 #define FALSE            0
 
 /* Input/Output operations */
+#define NOOP             0
 #define READ            10
 #define WRITE           11
 
 #define READ_ASCII      14
 #define WRITE_ASCII     15
+#define WRITE_NEWLINE   16
 
 /* Load/Store operations*/
 #define LOAD            20
@@ -52,11 +54,6 @@ void printGreeting() {
     puts("*** Please enter your program one instruction  ***");
     puts("***          (or data word) at a time.         ***");
     puts("*** Enter -99999 to stop entering your program ***");
-}
-
-void halt() {
-    puts("*** Simpletron execution terminated ***");
-    /*exit(EXIT_SUCCESS);*/
 }
 
 void computer_dump(int acc, 
@@ -100,15 +97,9 @@ int launch_shell(int memory[]) {
 
     printGreeting();
 
-    /* initialize memory to all zero */
-    int i;
-    for (i = 0; i < MEMORY_SIZE; ++i) {
-        memory[i] = 0;
-    }
-
     /* Read input, store in memory */
     int user_input = 0;
-    i = 0;
+    int i = 0;
     while ((user_input != -99999) && (i < MEMORY_SIZE)) {
         printf("%02d ? ", i);
         scanf("%d", &user_input);
@@ -137,8 +128,21 @@ int launch_shell(int memory[]) {
     return i;
 }
 
-void execute_file(char* filename) {
-    puts("This feature is not yet finished");
+int load_file(char* filename, int mem_arr[]) {
+    FILE* input_file;
+
+    if ( !(input_file = fopen(filename, "r")) ) {
+        puts("ERROR: no input file specified");
+        exit(EXIT_FAILURE);
+    }
+
+    char tmp[255];
+    int i = 0;
+    while( fscanf(input_file, "%s", &tmp) != EOF ){
+        mem_arr[i] = atoi(tmp);
+        i++;
+    }
+    return i;
 }
 
 int main(int argc, char* argv[]) {
@@ -150,19 +154,25 @@ int main(int argc, char* argv[]) {
 
     int i = 0;
     for (i = 0; i < argc; ++i) {
-        if ( strncmp(argv[i], "--file", sizeof("--file")) == 0 ) {
+        if ( strncmp(argv[i], "-f", sizeof("-f")) == 0 ) {
             will_launch_shell = FALSE;
             read_from_file = TRUE;
             strncat(input_filename, argv[i+1], FILE_NAME_SIZE);
         } 
     } 
 
+
+    /* initialize memory to all zero */
     int memory[MEMORY_SIZE];
+    for (i = 0; i < MEMORY_SIZE; ++i) {
+        memory[i] = 0;
+    }
+
 
     if (will_launch_shell) {
         i = launch_shell(memory);
     } else if (read_from_file) {
-        execute_file(input_filename);
+        i = load_file(input_filename, memory);
     } else {
         puts("An error occured. Shutting down");
         exit(EXIT_FAILURE);
@@ -207,6 +217,10 @@ int main(int argc, char* argv[]) {
             /* Write a word from memory in its ascii representation */
             case WRITE_ASCII:
                 printf("%c", memory[operand]);
+                break;
+
+            case WRITE_NEWLINE:
+                printf("\n");
                 break;
 
             /* Load a word from memory to the accumulator */
@@ -257,7 +271,7 @@ int main(int argc, char* argv[]) {
 
             /* display memory and registers */
             case HALT:
-                halt();
+                puts("*** Simpletron execution terminated ***");
                 computer_dump(accumulator, 
                               instruction_counter, 
                               instruction_register, 
@@ -267,11 +281,15 @@ int main(int argc, char* argv[]) {
                               MEMORY_SIZE); 
                 break;
 
+            case NOOP:
+                break;
+
             default:
                 printf("*** %3d: not a valid op_code ***\n", op_code); 
+                break;
         }
-
     } // end for loop
+
 
 
     return 0;
