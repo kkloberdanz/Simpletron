@@ -116,6 +116,7 @@ int main(void) {
 
 
             case READ:
+                printf("? ");
                 scanf("%d", &memory[operand]);
                 break; 
 
