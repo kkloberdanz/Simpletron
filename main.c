@@ -1,20 +1,35 @@
 /*
- * Programmer: Kyle Kloberdanz
- * Description: 
- *      Basic Simpletron emulator.
- *      --------------------------
+ * Programmer   : Kyle Kloberdanz
+ * Date Created : 7 Apr 2016
+ * Description  : 
+ *      Basic Simpletron emulator
+ *      -------------------------
  *      Instruction format is first 2 digits are op-code, 
  *      second 2 digits is the opperand
+ *
+ *      calling 'simpletron' launches the interactive shell
+ *
+ *      calling 'simpletron --file FILENAME' reads input from
+ *      the specified file (not yet built)
+ *
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MEMORY_SIZE    100
+#define FILE_NAME_SIZE 255
+
+#define TRUE             1
+#define FALSE            0
 
 /* Input/Output operations */
 #define READ            10
 #define WRITE           11
+
+#define READ_ASCII      14
+#define WRITE_ASCII     15
 
 /* Load/Store operations*/
 #define LOAD            20
@@ -80,13 +95,13 @@ void computer_dump(int acc,
 
 }
 
-int main(void) {
+/* returns the number of memory locations user entered a value to */
+int launch_shell(int memory[]) {
+
     printGreeting();
 
-    int memory[MEMORY_SIZE];
-
     /* initialize memory to all zero */
-    int i = 0;
+    int i;
     for (i = 0; i < MEMORY_SIZE; ++i) {
         memory[i] = 0;
     }
@@ -117,6 +132,40 @@ int main(void) {
     } else {
         puts("*** Program loading completed ***");
         puts("*** Program execution begins  ***");
+    } 
+
+    return i;
+}
+
+void execute_file(char* filename) {
+    puts("This feature is not yet finished");
+}
+
+int main(int argc, char* argv[]) {
+
+    char input_filename[FILE_NAME_SIZE] = "";
+
+    int will_launch_shell = TRUE;
+    int read_from_file    = FALSE;
+
+    int i = 0;
+    for (i = 0; i < argc; ++i) {
+        if ( strncmp(argv[i], "--file", sizeof("--file")) == 0 ) {
+            will_launch_shell = FALSE;
+            read_from_file = TRUE;
+            strncat(input_filename, argv[i+1], FILE_NAME_SIZE);
+        } 
+    } 
+
+    int memory[MEMORY_SIZE];
+
+    if (will_launch_shell) {
+        i = launch_shell(memory);
+    } else if (read_from_file) {
+        execute_file(input_filename);
+    } else {
+        puts("An error occured. Shutting down");
+        exit(EXIT_FAILURE);
     }
 
     /* initialize special registers */
@@ -126,6 +175,7 @@ int main(void) {
     int op_code               = 0;
     int operand               = 0;
 
+    /* execute instructions */
     for (instruction_counter  = 0; 
          instruction_counter  < i; 
          ++instruction_counter) {
@@ -135,19 +185,41 @@ int main(void) {
         op_code = instruction_register / 100;
         operand = instruction_register % 100; 
 
-        /* TODO: implement write, store
-         */
         switch (op_code) { 
 
+            /* Read a word from the terminal into memory */
             case READ:
                 printf("? ");
                 scanf("%d", &memory[operand]);
                 break; 
 
+            /* Read a word from the terminal as ascii into memory */
+            case READ_ASCII:
+                printf("? ");
+                scanf("%c", &memory[operand]);
+                break;
+
+            /* Write a word from memory to the terminal */
+            case WRITE:
+                printf("%d", memory[operand]);
+                break;
+
+            /* Write a word from memory in its ascii representation */
+            case WRITE_ASCII:
+                printf("%c", memory[operand]);
+                break;
+
+            /* Load a word from memory to the accumulator */
             case LOAD:
                 accumulator = memory[operand];
                 break;
 
+            /* Store a word from the accumulator into memory */
+            case STORE:
+                memory[operand] = accumulator;
+                break;
+
+            /* Arithmetic opperations */
             case ADD:
                 accumulator += memory[operand];
                 break;
@@ -164,22 +236,26 @@ int main(void) {
                 accumulator *= memory[operand];
                 break;
 
+            /* unconditional branch */
             case BRANCH:
                 instruction_counter = operand;
                 break;
 
+            /* branch if zero */
             case BRANCHZERO:
                 if (accumulator == 0) {
                     instruction_counter = operand;
                 }
                 break;
 
+            /* branch if negative */
             case BRANCHNEG:
                 if (accumulator < 0) {
                     instruction_counter = operand;
                 }
                 break;
 
+            /* display memory and registers */
             case HALT:
                 halt();
                 computer_dump(accumulator, 
@@ -190,6 +266,9 @@ int main(void) {
                               memory,
                               MEMORY_SIZE); 
                 break;
+
+            default:
+                printf("*** %3d: not a valid op_code ***\n", op_code); 
         }
 
     } // end for loop

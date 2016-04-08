@@ -1,3 +1,3 @@
 all:
-	gcc main.c -o run -O2
+	gcc main.c -o simpletron -O2
 
