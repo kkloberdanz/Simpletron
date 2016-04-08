@@ -129,6 +129,30 @@ int launch_shell(int memory[]) {
 }
 
 int load_file(char* filename, int mem_arr[]) {
+    int j;
+    char extension[4];
+
+    /* get extension type */
+    for (j = 0; filename[j] != '\0'; ++j) {
+        if (filename[j] == '.') {
+            if ( (filename[j+1] == 's') &&
+                 (filename[j+2] == 'm') &&
+                 (filename[j+3] == 'l') ) {
+                  
+                strcpy(extension, "sml");
+            }  else if ( (filename[j+1] == 's') &&
+                         (filename[j+2] == 'a') &&
+                         (filename[j+3] == 'l') ) {
+                strcpy(extension, "sal");
+            }
+        }
+    }
+
+    if ( strcmp(extension, "sal") == 0 ) {
+        puts("Reading an assembly file has not been built yet");
+        exit(EXIT_FAILURE);
+    }
+
     FILE* input_file;
 
     if ( !(input_file = fopen(filename, "r")) ) {
@@ -142,6 +166,7 @@ int load_file(char* filename, int mem_arr[]) {
         mem_arr[i] = atoi(tmp);
         i++;
     }
+
     return i;
 }
 
