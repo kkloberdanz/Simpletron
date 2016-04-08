@@ -144,6 +144,10 @@ int load_file(char* filename, int mem_arr[]) {
                          (filename[j+2] == 'a') &&
                          (filename[j+3] == 'l') ) {
                 strcpy(extension, "sal");
+            } else {
+                puts("*** invalid file type ***");
+                puts("*** valid extensions are .sml and .sal ***");
+                exit(EXIT_FAILURE);
             }
         }
     }
