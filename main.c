@@ -190,7 +190,14 @@ int main(int argc, char* argv[]) {
          instruction_counter  < i; 
          ++instruction_counter) {
 
-         instruction_register = memory[instruction_counter];
+        instruction_register = memory[instruction_counter];
+
+        if ((instruction_register > 9999) || 
+            (instruction_register < -9999)) {
+            puts("*** ERROR: instruction too large for memory ***");
+            puts("***              Shutting down              ***");
+            exit(EXIT_FAILURE);
+        }
 
         op_code = instruction_register / 100;
         operand = instruction_register % 100; 
@@ -206,7 +213,7 @@ int main(int argc, char* argv[]) {
             /* Read a word from the terminal as ascii into memory */
             case READ_ASCII:
                 printf("? ");
-                scanf("%c", &memory[operand]);
+                scanf("%s", &memory[operand]);
                 break;
 
             /* Write a word from memory to the terminal */
