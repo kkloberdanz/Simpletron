@@ -91,6 +91,16 @@ void computer_dump(int acc,
     } 
 }
 
+int is_valid_input(int input) {
+    if ((input != -99999) && 
+        (input >=  -9999) &&
+        (input <=   9999) ){
+        return TRUE;
+    } else {
+        return FALSE;
+    } 
+}
+
 /* returns the number of memory locations user entered a value to */
 int launch_shell(int memory[]) {
 
@@ -103,6 +113,14 @@ int launch_shell(int memory[]) {
         printf("%02d ? ", i);
         scanf("%d", &user_input);
 
+        if (is_valid_input(user_input)) {
+            memory[i] = user_input;
+            ++i;
+        } else { 
+            puts("*** ERROR: acceptable range is from -9999 to 9999 ***");
+        }
+
+        /*
         if ((user_input != -99999) && 
             (user_input >=  -9999) &&
             (user_input <=   9999) ){
@@ -114,6 +132,7 @@ int launch_shell(int memory[]) {
                      (user_input != -99999)) {
             puts("*** ERROR: acceptable range is from -9999 to 9999 ***");
         }
+        */
     }
 
     if (i > MEMORY_SIZE) {
@@ -151,6 +170,7 @@ int load_file(char* filename, int mem_arr[]) {
         }
     }
 
+    /* check if file type is valid */
     if ( strcmp(extension, "sal") == 0 ) {
         puts("Reading an assembly file has not been built yet");
         exit(EXIT_FAILURE);
@@ -163,36 +183,54 @@ int load_file(char* filename, int mem_arr[]) {
         exit(EXIT_FAILURE);
     }
 
+    int line_number = 0;
     char tmp[255];
     int i = 0;
     int is_comment = FALSE;
     int next_is_comment = FALSE;
-    while( fscanf(input_file, "%s", &tmp) != EOF ){
 
-        /* remove comments */
-        for (j = 0; tmp[j] != '\0'; ++j) {
+    /*
+     * TODO: line number not working for error handling.
+     *       Maybe read char by char instead of by string?
+     *
+     */
+    while( fscanf(input_file, "%s", &tmp) != EOF ){ 
+
+        /* remove comments and spaces */
+        for (j = 0; tmp[j] != '\0'; ++j) { 
+
+            if (tmp[j] == '\n') {
+                line_number++;
+            }
 
             if (tmp[j] == ' ') {
                 tmp[j] = '\0';
                 break;
-            }
+            } 
 
             if (tmp[j] == '#') {
                 tmp[j] = '\0';
                 next_is_comment = !next_is_comment;
                 break;
             } 
-
         } 
 
+        /* check if valid input, check if comment, if not put in memory */
         if ((tmp[0] != 0) && ((tmp != '\0') && (!is_comment))) { 
-            printf("\'%s\'\n", tmp);
-            mem_arr[i] = atoi(tmp);
-            i++;
-        }
-
+            if (is_valid_input(atoi(tmp))) {
+                /*printf("\'%s\'\n", tmp);*/
+                mem_arr[i] = atoi(tmp);
+                i++;
+            } else {
+                printf("error in file \'%s\' on line %d\n"
+                                    , filename, line_number);
+                exit(EXIT_FAILURE);
+            }
+        } 
+        
         is_comment = next_is_comment;
-    }
+    } /* end while */
+    fclose(input_file);
 
     return i;
 }
@@ -221,6 +259,7 @@ int main(int argc, char* argv[]) {
     }
 
 
+    /* decide if reading from file, or shell */
     if (will_launch_shell) {
         i = launch_shell(memory);
     } else if (read_from_file) {
