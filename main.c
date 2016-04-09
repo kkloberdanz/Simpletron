@@ -172,18 +172,20 @@ int load_file(char* filename, int mem_arr[]) {
         /* remove comments */
         for (j = 0; tmp[j] != '\0'; ++j) {
 
+            if (tmp[j] == ' ') {
+                tmp[j] = '\0';
+                break;
+            }
+
             if (tmp[j] == '#') {
                 tmp[j] = '\0';
                 next_is_comment = !next_is_comment;
                 break;
             } 
 
-            if (tmp[j] == ' ') {
-                tmp[j] = '\0';
-            }
         } 
 
-        if ((tmp != '\0') && (!is_comment)) { 
+        if ((tmp[0] != 0) && ((tmp != '\0') && (!is_comment))) { 
             printf("\'%s\'\n", tmp);
             mem_arr[i] = atoi(tmp);
             i++;
