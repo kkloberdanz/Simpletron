@@ -56,17 +56,16 @@ SAL or Simpletron Assembly Language is as follows:
 
          BRANCHZERO      42     branch if zero, goto opperand
 
-         HALT            43     display memory and registers, goto opperand
+         HALT            43     display memory and registers
 
     A valid instruction to read an integer from the terminal, and store
     it in memory location 20 would be:
         
         READ 20
 
-    Comments are denoted by ';'
-    So a valid comment would be:
+    Comments are surrounded by '#', So a valid comment would be:
 
-        READ 20     ; Reads an integer from terminal into mem location 20
+        READ 20  # Reads an integer from terminal into mem location 20 #
 
     The Simpletron Machine has 3 special registers:
         accumulator             Used for arithmetic and to store values 

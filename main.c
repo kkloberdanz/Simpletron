@@ -88,8 +88,7 @@ void computer_dump(int acc,
             printf("    %+05d", mem_arr[i+j]);
         }
         printf("%c", '\n');
-    }
-
+    } 
 }
 
 /* returns the number of memory locations user entered a value to */
@@ -166,9 +165,31 @@ int load_file(char* filename, int mem_arr[]) {
 
     char tmp[255];
     int i = 0;
+    int is_comment = FALSE;
+    int next_is_comment = FALSE;
     while( fscanf(input_file, "%s", &tmp) != EOF ){
-        mem_arr[i] = atoi(tmp);
-        i++;
+
+        /* remove comments */
+        for (j = 0; tmp[j] != '\0'; ++j) {
+
+            if (tmp[j] == '#') {
+                tmp[j] = '\0';
+                next_is_comment = !next_is_comment;
+                break;
+            } 
+
+            if (tmp[j] == ' ') {
+                tmp[j] = '\0';
+            }
+        } 
+
+        if ((tmp != '\0') && (!is_comment)) { 
+            printf("\'%s\'\n", tmp);
+            mem_arr[i] = atoi(tmp);
+            i++;
+        }
+
+        is_comment = next_is_comment;
     }
 
     return i;
