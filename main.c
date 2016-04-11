@@ -16,9 +16,11 @@
 
 /*
  * TODO:
- * Error messages (include line number)
- * Make Assembly code
- * Convert from dec to hex
+ *     Error messages (include line number)
+ *     Make Assembly code
+ *     Convert from dec to hex
+ *     Add string capabilities
+ *     Add logical opperations
  */
 
 #include <stdio.h>
@@ -49,12 +51,15 @@
 #define SUBTRACT        31
 #define DIVIDE          32
 #define MULTIPLY        33
+#define MOD             34
 
 /* Transfter of control Operations */
 #define BRANCH          40
 #define BRANCHNEG       41
 #define BRANCHZERO      42
 #define HALT            43
+
+/* logical opperations */
 
 void printGreeting() {
     puts("***           Welcome to Simpletron!           ***");
@@ -348,6 +353,11 @@ int main(int argc, char* argv[]) {
             case MULTIPLY:
                 math_opperand_register = memory[operand];
                 accumulator *= math_opperand_register;
+                break;
+                
+            case MOD:
+                math_opperand_register = memory[operand];
+                accumulator %= math_opperand_register;
                 break;
 
             /* unconditional branch */
