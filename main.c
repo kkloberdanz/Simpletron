@@ -59,6 +59,7 @@ void printGreeting() {
 void computer_dump(int acc, 
                    int ins_count, 
                    int ins_reg, 
+                   int math_opperand_reg,
                    int op_code, 
                    int operand,
                    int mem_arr[],
@@ -69,8 +70,9 @@ void computer_dump(int acc,
     printf("accumulator             %+05d\n", acc);
     printf("instruction_counter     %02d\n" , ins_count);
     printf("instruction_register    %+05d\n", ins_reg);
-    printf("op_code                 %02d\n", op_code);
-    printf("operand                 %02d\n", operand);
+    printf("math_opperand_register  %+05d\n", math_opperand_reg);
+    printf("op_code                 %02d\n" , op_code);
+    printf("operand                 %02d\n" , operand);
 
     const int col_len = 5;
     int i, j;
@@ -92,9 +94,9 @@ void computer_dump(int acc,
 }
 
 int is_valid_input(int input) {
-    if ((input != -99999) && 
-        (input >=  -9999) &&
-        (input <=   9999) ){
+    if ((input == -99999) || 
+       ((input >=  -9999) &&
+        (input <=   9999) )){
         return TRUE;
     } else {
         return FALSE;
@@ -134,14 +136,6 @@ int launch_shell(int memory[]) {
         }
         */
     }
-
-    if (i > MEMORY_SIZE) {
-        puts("Out of memory! Shutting down");
-        exit(EXIT_FAILURE);
-    } else {
-        puts("*** Program loading completed ***");
-        puts("*** Program execution begins  ***");
-    } 
 
     return i;
 }
@@ -218,7 +212,6 @@ int load_file(char* filename, int mem_arr[]) {
         /* check if valid input, check if comment, if not put in memory */
         if ((tmp[0] != 0) && ((tmp != '\0') && (!is_comment))) { 
             if (is_valid_input(atoi(tmp))) {
-                /*printf("\'%s\'\n", tmp);*/
                 mem_arr[i] = atoi(tmp);
                 i++;
             } else {
@@ -269,13 +262,22 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    /* initialize special registers */
-    int accumulator           = 0;
-    int instruction_counter   = 0;
-    int instruction_register  = 0;
+    if (i > MEMORY_SIZE) {
+        puts("Out of memory! Shutting down");
+        exit(EXIT_FAILURE);
+    } else {
+        puts("*** Program loading completed ***");
+        puts("*** Program execution begins  ***");
+    } 
 
-    int op_code               = 0;
-    int operand               = 0;
+    /* initialize special registers */
+    int accumulator            = 0;
+    int instruction_counter    = 0;
+    int instruction_register   = 0;
+    int math_opperand_register = 0;
+
+    int op_code                = 0;
+    int operand                = 0;
 
     /* execute instructions */
     for (instruction_counter  = 0; 
@@ -318,6 +320,7 @@ int main(int argc, char* argv[]) {
                 printf("%c", memory[operand]);
                 break;
 
+            /* Write newline to the terminal */
             case WRITE_NEWLINE:
                 printf("\n");
                 break;
@@ -334,19 +337,23 @@ int main(int argc, char* argv[]) {
 
             /* Arithmetic opperations */
             case ADD:
-                accumulator += memory[operand];
+                math_opperand_register = memory[operand];
+                accumulator += math_opperand_register;
                 break;
 
             case SUBTRACT:
-                accumulator -= memory[operand];
+                math_opperand_register = memory[operand];
+                accumulator -= math_opperand_register;
                 break;
 
             case DIVIDE:
-                accumulator /= memory[operand];
+                math_opperand_register = memory[operand];
+                accumulator /= math_opperand_register;
                 break;
 
             case MULTIPLY:
-                accumulator *= memory[operand];
+                math_opperand_register = memory[operand];
+                accumulator *= math_opperand_register;
                 break;
 
             /* unconditional branch */
@@ -374,6 +381,7 @@ int main(int argc, char* argv[]) {
                 computer_dump(accumulator, 
                               instruction_counter, 
                               instruction_register, 
+                              math_opperand_register,
                               op_code, 
                               operand,
                               memory,
