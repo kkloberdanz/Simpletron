@@ -1,5 +1,5 @@
 # This program prompts user for 2 integers, then adds them #
-1007 # 00 #
+1007
 1008
 2007 
 3008
