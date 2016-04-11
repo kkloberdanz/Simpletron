@@ -9,9 +9,16 @@
  *
  *      calling 'simpletron' launches the interactive shell
  *
- *      calling 'simpletron --file FILENAME' reads input from
+ *      calling 'simpletron -f FILENAME' reads input from
  *      the specified file (not yet built)
  *
+ */
+
+/*
+ * TODO:
+ * Error messages (include line number)
+ * Make Assembly code
+ * Convert from dec to hex
  */
 
 #include <stdio.h>
