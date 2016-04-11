@@ -94,9 +94,8 @@ void computer_dump(int acc,
 }
 
 int is_valid_input(int input) {
-    if ((input == -99999) || 
-       ((input >=  -9999) &&
-        (input <=   9999) )){
+    if ((input >=  -9999) &&
+        (input <=   9999) ){
         return TRUE;
     } else {
         return FALSE;
@@ -118,23 +117,11 @@ int launch_shell(int memory[]) {
         if (is_valid_input(user_input)) {
             memory[i] = user_input;
             ++i;
+        } else if (user_input == -99999) {
+            ;
         } else { 
             puts("*** ERROR: acceptable range is from -9999 to 9999 ***");
         }
-
-        /*
-        if ((user_input != -99999) && 
-            (user_input >=  -9999) &&
-            (user_input <=   9999) ){
-
-            memory[i] = user_input;
-            ++i;
-        } else if ( ((user_input <   -9999)  ||
-                     (user_input >    9999)) &&
-                     (user_input != -99999)) {
-            puts("*** ERROR: acceptable range is from -9999 to 9999 ***");
-        }
-        */
     }
 
     return i;
