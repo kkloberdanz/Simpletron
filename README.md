@@ -4,7 +4,7 @@ A basic simpletron emulator coded in C
 
 Simpletron Machine Language code can be executed from a .sml file
 
-(this feature is coming soon)
+(NOT YET IMPLEMENTED! this feature is coming soon)
 Assembly code can be executed from a .sal file
 SAL or Simpletron Assembly Language is as follows:
     
