@@ -21,6 +21,11 @@
  *     Convert from dec to hex
  *     Add string capabilities
  *     Add logical opperations
+ *     Add bitwise operations
+ *     expand each word to be 1 byte 
+ *          (i.e. ooiiiiii, o - opcode, i - instruction
+ *           or   dddddddd, d - data)
+ *
  */
 
 #include <stdio.h>
@@ -289,7 +294,7 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     } else {
         puts("*** Program loading completed ***");
-        puts("*** Program execution begins  ***");
+        puts("*** Program execution begins...  ***");
     } 
 
     /* initialize special registers */
@@ -315,7 +320,7 @@ int main(int argc, char* argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        op_code = instruction_register / 100;
+        Opcode op_code = instruction_register / 100;
         operand = instruction_register % 100; 
 
         switch (op_code) { 
@@ -420,6 +425,16 @@ int main(int argc, char* argv[]) {
 
             default:
                 printf("*** %3d: not a valid op_code ***\n", op_code); 
+                puts(  "*** Execution FAILED shutting down ***");
+                computer_dump(accumulator, 
+                              instruction_counter, 
+                              instruction_register, 
+                              math_opperand_register,
+                              op_code, 
+                              operand,
+                              memory,
+                              MEMORY_SIZE);
+                exit(EXIT_FAILURE);
                 break;
         }
     } // end for loop 
