@@ -1,3 +1,3 @@
 all:
-	gcc main.c -o simpletron_0_3 -O2
+	gcc main.c -o simpletron_0_4 -O2
 

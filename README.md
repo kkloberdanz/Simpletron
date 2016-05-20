@@ -63,9 +63,9 @@ SAL or Simpletron Assembly Language is as follows:
         
         READ 20
 
-    Comments are surrounded by '#', So a valid comment would be:
+    Comments are single line only, and are denoted with either hash 
+    symbols '#', or semicolons ';'
 
-        READ 20  # Reads an integer from terminal into mem location 20 #
 
     The Simpletron Machine has 3 special registers:
         accumulator             Used for arithmetic and to store values 

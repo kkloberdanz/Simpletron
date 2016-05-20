@@ -33,31 +33,32 @@
 #define TRUE             1
 #define FALSE            0
 
-/* Input/Output operations */
-#define NOOP             0
-#define READ            10
-#define WRITE           11
+typedef enum {
+    /* Input/Output operations */
+    NOOP          =  0,
+    READ          = 10,
+    WRITE         = 11,
+    READ_ASCII    = 14,
+    WRITE_ASCII   = 15,
+    WRITE_NEWLINE = 16,
 
-#define READ_ASCII      14
-#define WRITE_ASCII     15
-#define WRITE_NEWLINE   16
+    /* Load/Store operations*/
+    LOAD          = 20,
+    STORE         = 21,
 
-/* Load/Store operations*/
-#define LOAD            20
-#define STORE           21
+    /* Arithmetic Operations */
+    ADD           = 30,
+    SUBTRACT      = 31,
+    DIVIDE        = 32,
+    MULTIPLY      = 33,
+    MOD           = 34,
 
-/* Arithmetic Operations */
-#define ADD             30
-#define SUBTRACT        31
-#define DIVIDE          32
-#define MULTIPLY        33
-#define MOD             34
-
-/* Transfter of control Operations */
-#define BRANCH          40
-#define BRANCHNEG       41
-#define BRANCHZERO      42
-#define HALT            43
+    /* Transfter of control Operations */
+    BRANCH        = 40,
+    BRANCHNEG     = 41,
+    BRANCHZERO    = 42,
+    HALT          = 43
+} Opcode;
 
 /* logical opperations */
 
@@ -139,123 +140,145 @@ int launch_shell(int memory[]) {
     return i;
 }
 
-int load_file(char* filename, int mem_arr[]) {
-    int j;
-    char extension[4];
-
-    /* get extension type */
-    for (j = 0; filename[j] != '\0'; ++j) {
-        if (filename[j] == '.') {
-            if ( (filename[j+1] == 's') &&
-                 (filename[j+2] == 'm') &&
-                 (filename[j+3] == 'l') ) {
-                  
-                strcpy(extension, "sml");
-            }  else if ( (filename[j+1] == 's') &&
-                         (filename[j+2] == 'a') &&
-                         (filename[j+3] == 'l') ) {
-                strcpy(extension, "sal");
-            } else {
-                puts("*** invalid file type ***");
-                puts("*** valid extensions are .sml and .sal ***");
-                exit(EXIT_FAILURE);
-            }
-        }
-    }
-
-    /* check if file type is valid */
-    if ( strcmp(extension, "sal") == 0 ) {
-        puts("Reading an assembly file has not been built yet");
-        exit(EXIT_FAILURE);
-    }
-
+int load_asm_file(char* filename, int mem_arr[]) {
     FILE* input_file;
 
     if ( !(input_file = fopen(filename, "r")) ) {
         puts("ERROR: no input file specified");
         exit(EXIT_FAILURE);
-    }
+    } 
 
-    int line_number = 0;
-    char tmp[255];
+    int in_comment, save;
+    char c = 'a'; 
+    char instruction_str[5];
+    int instruction;
+    int line_number = 1;
     int i = 0;
-    int is_comment = FALSE;
-    int next_is_comment = FALSE;
+    int j = 0;
 
-    /*
-     * TODO: line number not working for error handling.
-     *       Maybe read char by char instead of by string?
-     *
-     */
-    while( fscanf(input_file, "%s", &tmp) != EOF ){ 
+    while (c != EOF) {
 
-        /* remove comments and spaces */
-        for (j = 0; tmp[j] != '\0'; ++j) { 
-
-            if (tmp[j] == '\n') {
-                line_number++;
-            }
-
-            if (tmp[j] == ' ') {
-                tmp[j] = '\0';
-                break;
-            } 
-
-            if (tmp[j] == '#') {
-                tmp[j] = '\0';
-                next_is_comment = !next_is_comment;
-                break;
-            } 
-        } 
-
-        /* check if valid input, check if comment, if not put in memory */
-        if ((tmp[0] != 0) && ((tmp != '\0') && (!is_comment))) { 
-            if (is_valid_input(atoi(tmp))) {
-                mem_arr[i] = atoi(tmp);
+        if (j >= 4) {
+            j = 0; 
+            instruction_str[4] = '\0';
+            instruction = atoi(instruction_str);
+            if (is_valid_input(instruction)) {
+                mem_arr[i] = instruction;
                 i++;
             } else {
-                printf("error in file \'%s\' on line %d\n"
-                                    , filename, line_number);
-                exit(EXIT_FAILURE);
+                printf("error in file \'%s\' on line %d\n" , 
+                        filename, line_number);
             }
+        }
+
+        save = TRUE;
+        c = fgetc(input_file); 
+
+        if (c == '\n') {
+            line_number++;
+            in_comment = FALSE;
+            save = FALSE;
+            line_number++;
+            j = 0;
+        } 
+
+        if ((c == '#') || (c == ';')) {
+            in_comment = TRUE;
+            j = 0;
+        } 
+
+        if ((!in_comment) && (save)){
+            instruction_str[j] = c;
+            j++;
         } 
         
-        is_comment = next_is_comment;
     } /* end while */
-    fclose(input_file);
+    fclose(input_file); 
+    return i;
 
+}
+
+int load_sml_file(char* filename, int mem_arr[]) {
+    FILE* input_file;
+
+    if ( !(input_file = fopen(filename, "r")) ) {
+        puts("ERROR: no input file specified");
+        exit(EXIT_FAILURE);
+    } 
+
+    int in_comment, save;
+    char c = 'a'; 
+    char instruction_str[5];
+    int instruction;
+    int line_number = 1;
+    int i = 0;
+    int j = 0;
+
+    while (c != EOF) {
+
+        if (j >= 4) {
+            j = 0; 
+            instruction_str[4] = '\0';
+            instruction = atoi(instruction_str);
+            if (is_valid_input(instruction)) {
+                mem_arr[i] = instruction;
+                i++;
+            } else {
+                printf("error in file \'%s\' on line %d\n" , 
+                        filename, line_number);
+            }
+        }
+
+        save = TRUE;
+        c = fgetc(input_file); 
+
+        if (c == '\n') {
+            line_number++;
+            in_comment = FALSE;
+            save = FALSE;
+            line_number++;
+            j = 0;
+        } 
+
+        if ((c == '#') || (c == ';')) {
+            in_comment = TRUE;
+            j = 0;
+        } 
+
+        if ((!in_comment) && (save)){
+            instruction_str[j] = c;
+            j++;
+        } 
+        
+    } /* end while */
+    fclose(input_file); 
     return i;
 }
 
 int main(int argc, char* argv[]) {
 
-    char input_filename[FILE_NAME_SIZE] = "";
+    char filename[FILE_NAME_SIZE] = "";
 
     int will_launch_shell = TRUE;
     int read_from_file    = FALSE;
+
+    /* initialize memory to all zero */
+    int memory[MEMORY_SIZE] = {0};
 
     int i = 0;
     for (i = 0; i < argc; ++i) {
         if ( strncmp(argv[i], "-f", sizeof("-f")) == 0 ) {
             will_launch_shell = FALSE;
             read_from_file = TRUE;
-            strncat(input_filename, argv[i+1], FILE_NAME_SIZE);
+            strncat(filename, argv[i+1], FILE_NAME_SIZE);
         } 
     } 
-
-
-    /* initialize memory to all zero */
-    int memory[MEMORY_SIZE];
-    for (i = 0; i < MEMORY_SIZE; ++i) {
-        memory[i] = 0;
-    }
-
 
     /* decide if reading from file, or shell */
     if (will_launch_shell) {
         i = launch_shell(memory);
     } else if (read_from_file) {
-        i = load_file(input_filename, memory);
+        i = load_sml_file(filename, memory);
     } else {
         puts("An error occured. Shutting down");
         exit(EXIT_FAILURE);
@@ -389,7 +412,7 @@ int main(int argc, char* argv[]) {
                               op_code, 
                               operand,
                               memory,
-                              MEMORY_SIZE); 
+                              MEMORY_SIZE);
                 break;
 
             case NOOP:
@@ -399,9 +422,6 @@ int main(int argc, char* argv[]) {
                 printf("*** %3d: not a valid op_code ***\n", op_code); 
                 break;
         }
-    } // end for loop
-
-
-
+    } // end for loop 
     return 0;
 }
